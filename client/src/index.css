@@ -54,6 +54,12 @@ button:focus-visible { outline: 2px solid #d8a09b; outline-offset: 3px; }
 .state-overlay p { color: #91aaa0; margin: 9px 0 20px; font-size: 12px; }
 .primary-button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #d89791; background: #d89791; color: #14262a; padding: 11px 16px; font: 600 10px "DM Mono"; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: .18s ease; }
 .primary-button:hover { background: #f1b7aa; transform: translateY(-2px); box-shadow: 0 7px 18px rgba(216, 140, 132, .22); }
+.leaderboard { width: min(220px, 78%); margin: 3px 0 17px; padding: 9px 11px; border-top: 1px solid rgba(174, 212, 193, .2); border-bottom: 1px solid rgba(174, 212, 193, .2); }
+.leaderboard-title { color: #89a69a; font: 8px "DM Mono"; letter-spacing: .11em; margin-bottom: 5px; }
+.leader-row { display: grid; grid-template-columns: 22px 1fr auto; align-items: baseline; gap: 7px; padding: 4px 0; border-top: 1px solid rgba(174, 212, 193, .09); color: #cbdccf; font: 10px "DM Mono"; }
+.leader-row span { color: #d89791; }
+.leader-row strong { font-size: 13px; font-weight: 500; text-align: left; }
+.leader-row small { color: #77938a; font-size: 8px; }
 .eat-flash { position: absolute; z-index: 6; top: 22px; left: 50%; transform: translateX(-50%); color: #f0c47b; font: 500 10px "DM Mono"; text-transform: uppercase; letter-spacing: .12em; animation: floatUp 1s ease both; }
 @keyframes floatUp { from { opacity: 0; transform: translate(-50%, 9px); } 25% { opacity: 1; } to { opacity: 0; transform: translate(-50%, -14px); } }
 .score-column { align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }

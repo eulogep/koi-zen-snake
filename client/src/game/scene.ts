@@ -8,7 +8,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { Cell, KoiGame, KoiSnapshot } from "./koiGame";
+import { Cell, Flower, KoiSnapshot } from "./koiGame";
 
 export interface GameSceneHandle {
   scene: Scene;
@@ -90,24 +90,29 @@ export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement)
   const foodMeshes: Mesh[] = [];
   const rippleMeshes: { mesh: Mesh; life: number }[] = [];
   let lastSnakeLength = 0;
-  let previousFood: Cell | null = null;
+  let previousFoodKey = "";
 
   const cellToWorld = (cell: Cell) => new Vector3(cell.x - 11.5, 0.27, cell.y - 8.5);
   const clearMeshArray = (items: Mesh[]) => items.splice(0).forEach((mesh) => mesh.dispose());
 
-  const createFood = (cell: Cell) => {
+  const createFood = (flower: Flower) => {
     clearMeshArray(foodMeshes);
-    const center = cellToWorld(cell);
-    for (let i = 0; i < 6; i += 1) {
-      const angle = (Math.PI * 2 * i) / 6;
+    const center = cellToWorld(flower);
+    const palette = flower.type === "gold" ? lotusGold : flower.type === "pink" ? lotusPink : koiCream;
+    const petals = flower.type === "gold" ? 8 : flower.type === "pink" ? 6 : 5;
+    const diameter = flower.type === "gold" ? 0.56 : flower.type === "pink" ? 0.5 : 0.44;
+    for (let i = 0; i < petals; i += 1) {
+      const angle = (Math.PI * 2 * i) / petals;
       const petal = MeshBuilder.CreateCylinder(`petal-${i}`, { diameter: 0.5, height: 0.08, tessellation: 12 }, scene);
+      petal.scaling.x = diameter / 0.5;
+      petal.scaling.z = diameter / 0.5;
       petal.position = center.add(new Vector3(Math.cos(angle) * 0.28, 0.02, Math.sin(angle) * 0.28));
-      petal.material = lotusPink;
+      petal.material = palette;
       foodMeshes.push(petal);
     }
     const centerMesh = MeshBuilder.CreateCylinder("lotus-center", { diameter: 0.34, height: 0.14, tessellation: 12 }, scene);
     centerMesh.position = center.add(new Vector3(0, 0.1, 0));
-    centerMesh.material = lotusGold;
+    centerMesh.material = flower.type === "white" ? lotusGold : palette;
     foodMeshes.push(centerMesh);
   };
 
@@ -120,9 +125,10 @@ export async function createGameScene(engine: Engine, canvas: HTMLCanvasElement)
   };
 
   const sync = (snapshot: KoiSnapshot) => {
-    if (snapshot.food !== previousFood && (!previousFood || snapshot.food.x !== previousFood.x || snapshot.food.y !== previousFood.y)) {
+    const foodKey = `${snapshot.food.x}:${snapshot.food.y}:${snapshot.food.type}`;
+    if (foodKey !== previousFoodKey) {
       createFood(snapshot.food);
-      previousFood = snapshot.food;
+      previousFoodKey = foodKey;
     }
     if (snapshot.lastEaten) createRipple(snapshot.snake[0], true);
     if (snapshot.snake.length !== lastSnakeLength) {

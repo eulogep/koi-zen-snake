@@ -169,3 +169,25 @@ No external image assets are required. All visible game art is authored from pro
 - [ ] Demo route shows movement and interaction.
 - [ ] Final checkpoint saved.
 - [ ] User told to publish from WebDev Management UI.
+
+
+# UPDATE — Immersion et classement local
+
+## Audio
+Le jeu propose une ambiance musicale instrumentale originale de 150 secondes, générée pour ce jardin zen et bouclée à faible volume. Les effets sonores sont synthétisés à la volée avec Web Audio : tintement doux lors d’un lotus cueilli, variante plus brillante pour les fleurs dorées, petit souffle de virage et note descendante feutrée en cas de collision. Le bouton volume permet de couper ou réactiver la musique et les effets.
+
+## Variétés de lotus
+Le lotus ivoire rapporte 10 points, le lotus rose 20 points et le lotus d’or 35 points. Les probabilités d’apparition sont respectivement de 58 %, 29 % et 13 %. L’affichage inférieur rappelle ces valeurs et le message de collecte précise la variété cueillie.
+
+## Classement local
+À chaque fin de partie, le score est enregistré dans `localStorage` sous `koi-zen-leaderboard`. Le système conserve les cinq meilleurs scores, les trie par ordre décroissant et affiche les trois premiers dans l’écran de défaite. Aucun compte ni serveur n’est requis.
+
+## Mise à jour QA
+
+| Zone | Vérification | Statut | Preuve |
+|---|---|---|---|
+| Audio | Bouton volume et déverrouillage après interaction | Pass par implémentation | `KoiAudio` et bouton volume intégrés |
+| Musique | Boucle d’ambiance chargée depuis WebDev Storage | Pass | Fichier `/manus-storage/koi_zen_garden_ambient_75a5ab9d.wav` téléversé |
+| Bonus | Variétés ivoire, rose et or | Pass | Score et probabilités dans `KoiGame` |
+| Classement | Enregistrement en fin de partie et affichage | Pass | Parcours navigateur : score 010 affiché dans le jardin des meilleurs scores |
+| Build enrichi | Type-check et production build | Pass | `pnpm check` et `pnpm build` propres |
