@@ -191,3 +191,18 @@ Le lotus ivoire rapporte 10 points, le lotus rose 20 points et le lotus d’or 3
 | Bonus | Variétés ivoire, rose et or | Pass | Score et probabilités dans `KoiGame` |
 | Classement | Enregistrement en fin de partie et affichage | Pass | Parcours navigateur : score 010 affiché dans le jardin des meilleurs scores |
 | Build enrichi | Type-check et production build | Pass | `pnpm check` et `pnpm build` propres |
+
+# UPDATE — Menu, pause et difficulté
+
+Le menu principal propose désormais un bouton **À propos** qui ouvre une fiche modale avec les crédits d’Euloge, la licence MIT et les technologies utilisées. La pause présente une animation de vaguelettes respirantes, respecte `prefers-reduced-motion` via les règles CSS existantes et déclenche un accord zen spécifique avec trois notes espacées. Le son est disponible avec le bouton de pause, la touche Espace et la touche P.
+
+Trois rythmes sont proposés au démarrage : **Brume** à 186 ms par cellule avec peu de fleurs bonus, **Jardin** à 148 ms avec un équilibrage standard et **Torrent** à 112 ms avec une fréquence accrue de fleurs roses et dorées. La vitesse accélère ensuite légèrement avec le score, tandis que la fréquence des bonus reste liée au niveau choisi.
+
+| Zone | Vérification | Statut | Preuve |
+|---|---|---|---|
+| À propos | Ouverture depuis le menu principal | Pass par implémentation | Bouton `À PROPOS`, dialogue modal crédité |
+| Licence | Informations MIT lisibles dans le dialogue | Pass par implémentation | Mention `MIT · Open Source` |
+| Pause | Animation et son dédié | Pass par implémentation | `pause-ripples`, `playPause()`, Espace/P et bouton |
+| Difficulté | Choix Brume/Jardin/Torrent | Pass | Picker intégré à l’état de départ |
+| Vitesse | Valeurs distinctes transmises au moteur | Pass | `DIFFICULTIES` dans `KoiGame` |
+| Fleurs | Fréquence bonus dépendante du niveau | Pass | `bonusChance` appliqué à `placeFood()` |

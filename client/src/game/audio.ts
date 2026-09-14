@@ -60,6 +60,23 @@ export class KoiAudio {
     osc.stop(now + 0.14);
   }
 
+  playPause() {
+    if (!this.ready || !this.context || !this.enabled) return;
+    const now = this.context.currentTime;
+    [261.63, 392, 523.25].forEach((frequency, index) => {
+      const osc = this.context!.createOscillator();
+      const gain = this.context!.createGain();
+      osc.type = "sine";
+      osc.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, now + index * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.035, now + index * 0.08 + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.08 + 0.62);
+      osc.connect(gain).connect(this.context!.destination);
+      osc.start(now + index * 0.08);
+      osc.stop(now + index * 0.08 + 0.66);
+    });
+  }
+
   playCollision() {
     if (!this.ready || !this.context || !this.enabled) return;
     const now = this.context.currentTime;

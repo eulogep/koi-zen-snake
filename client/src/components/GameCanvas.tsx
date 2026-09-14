@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
 import { createGameScene } from "../game/scene";
-import { Direction, KoiGame, KoiSnapshot } from "../game/koiGame";
+import { Difficulty, Direction, KoiGame, KoiSnapshot } from "../game/koiGame";
 
 export interface GameCanvasHandle {
   move(direction: Direction): void;
@@ -12,10 +12,12 @@ export interface GameCanvasHandle {
 
 interface Props {
   demo?: boolean;
+  difficulty?: Difficulty;
+  onTogglePause?: () => void;
   onStateChange: (snapshot: KoiSnapshot) => void;
 }
 
-const GameCanvas = forwardRef<GameCanvasHandle, Props>(({ demo = false, onStateChange }, ref) => {
+const GameCanvas = forwardRef<GameCanvasHandle, Props>(({ demo = false, difficulty = "normal", onTogglePause, onStateChange }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gameRef = useRef<KoiGame | null>(null);
   const stateRef = useRef<KoiSnapshot | null>(null);
@@ -32,7 +34,7 @@ const GameCanvas = forwardRef<GameCanvasHandle, Props>(({ demo = false, onStateC
     if (!canvas) return;
     const engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true }, true);
     engine.setHardwareScalingLevel(Math.min(1.5, window.devicePixelRatio || 1));
-    const game = new KoiGame(demo);
+    const game = new KoiGame(demo, difficulty);
     gameRef.current = game;
     let disposed = false;
     let elapsed = 0;
@@ -61,6 +63,7 @@ const GameCanvas = forwardRef<GameCanvasHandle, Props>(({ demo = false, onStateC
         } else if (event.key === " " || event.key.toLowerCase() === "p") {
           event.preventDefault();
           game.togglePause();
+          onTogglePause?.();
           emit();
         } else if (event.key.toLowerCase() === "r") {
           event.preventDefault();
@@ -102,7 +105,7 @@ const GameCanvas = forwardRef<GameCanvasHandle, Props>(({ demo = false, onStateC
       cleanup?.();
       gameRef.current = null;
     };
-  }, [demo, onStateChange]);
+  }, [demo, difficulty, onTogglePause, onStateChange]);
 
   return <canvas ref={canvasRef} className="game-canvas" aria-label="Bassin zen interactif du jeu Koi Zen Snake" />;
 });

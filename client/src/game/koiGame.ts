@@ -1,6 +1,7 @@
 export type Direction = "up" | "down" | "left" | "right";
 export type GameStatus = "start" | "playing" | "paused" | "gameover";
 export type FlowerType = "white" | "pink" | "gold";
+export type Difficulty = "easy" | "normal" | "hard";
 
 export interface Cell { x: number; y: number; }
 export interface Flower { x: number; y: number; type: FlowerType; points: number; }
@@ -15,6 +16,7 @@ export interface KoiSnapshot {
   lastPoints: number;
   lastFlower: FlowerType;
   lastCollision: boolean;
+  difficulty: Difficulty;
 }
 
 const OPPOSITE: Record<Direction, Direction> = { up: "down", down: "up", left: "right", right: "left" };
@@ -24,12 +26,18 @@ const FLOWERS: Record<FlowerType, { points: number; chance: number }> = {
   pink: { points: 20, chance: 0.29 },
   gold: { points: 35, chance: 0.13 },
 };
+const DIFFICULTIES: Record<Difficulty, { speed: number; bonusChance: number }> = {
+  easy: { speed: 186, bonusChance: 0.2 },
+  normal: { speed: 148, bonusChance: 0.42 },
+  hard: { speed: 112, bonusChance: 0.62 },
+};
 const sameCell = (a: Cell, b: Cell) => a.x === b.x && a.y === b.y;
 
 export class KoiGame {
   readonly cols = 24;
   readonly rows = 18;
   readonly demo: boolean;
+  readonly difficulty: Difficulty;
   private snake: Cell[] = [];
   private direction: Direction = "right";
   private queuedDirection: Direction = "right";
@@ -43,8 +51,9 @@ export class KoiGame {
   private lastFlower: FlowerType = "white";
   private lastCollision = false;
 
-  constructor(demo = false) {
+  constructor(demo = false, difficulty: Difficulty = "normal") {
     this.demo = demo;
+    this.difficulty = difficulty;
     this.best = Number(window.localStorage.getItem("koi-zen-best") || 0);
     this.reset();
   }
@@ -73,8 +82,9 @@ export class KoiGame {
   getSnapshot(): KoiSnapshot {
     return {
       status: this.status, snake: this.snake.map((cell) => ({ ...cell })), food: { ...this.food }, score: this.score,
-      best: this.best, speedMs: Math.max(108, 148 - Math.floor(this.score / 50) * 8), lastEaten: this.lastEaten,
+      best: this.best, speedMs: Math.max(82, DIFFICULTIES[this.difficulty].speed - Math.floor(this.score / 50) * 8), lastEaten: this.lastEaten,
       lastPoints: this.lastPoints, lastFlower: this.lastFlower, lastCollision: this.lastCollision,
+      difficulty: this.difficulty,
     };
   }
 
@@ -114,7 +124,8 @@ export class KoiGame {
       const candidate = { x: this.randomInt(this.cols), y: this.randomInt(this.rows) };
       if (!this.snake.some((cell) => sameCell(cell, candidate))) {
         const roll = this.rng / 4294967296;
-        const type: FlowerType = roll < FLOWERS.gold.chance ? "gold" : roll < FLOWERS.gold.chance + FLOWERS.pink.chance ? "pink" : "white";
+        const bonusRoll = roll * DIFFICULTIES[this.difficulty].bonusChance / (FLOWERS.pink.chance + FLOWERS.gold.chance);
+        const type: FlowerType = bonusRoll < FLOWERS.gold.chance ? "gold" : bonusRoll < FLOWERS.gold.chance + FLOWERS.pink.chance ? "pink" : "white";
         this.food = { ...candidate, type, points: FLOWERS[type].points };
         return;
       }
